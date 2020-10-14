@@ -16,6 +16,7 @@ import com.example.mediumcontroller.adapter.SceneAdapter;
 import com.example.mediumcontroller.bean.Scene;
 import com.example.mediumcontroller.data.SharedHelper;
 import com.example.mediumcontroller.service.MusicService;
+import com.example.mediumcontroller.service.SceneService;
 
 import java.util.List;
 
@@ -43,6 +44,9 @@ public class MainActivity extends AppCompatActivity {
         findId();
 
         initWidget();
+
+        Intent intent = new Intent(this , SceneService.class);
+        startService(intent);
 
     }
 
