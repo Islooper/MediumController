@@ -155,9 +155,6 @@ public class MainActivity extends AppCompatActivity {
                             // 存储该信息
                             SharedHelper  helper = new SharedHelper(context);
                             helper.save(scene , scene.getUuid());
-
-                            // TODO 新增定时操作
-
                         }
 
                     }
