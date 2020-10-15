@@ -5,15 +5,23 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.mediumcontroller.adapter.SceneAdapter;
 import com.example.mediumcontroller.bean.Scene;
+import com.example.mediumcontroller.config.Config;
 import com.example.mediumcontroller.data.SharedHelper;
 import com.example.mediumcontroller.service.MusicService;
 import com.example.mediumcontroller.service.SceneService;
@@ -41,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         context = this;
+        gwShare = new GwShare(context);
+
+        initGwid();
         findId();
 
         initWidget();
@@ -48,6 +59,58 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this , SceneService.class);
         startService(intent);
 
+    }
+
+
+    private GwShare gwShare;
+
+    private void initGwid() {
+        Config.gwid  = gwShare.read();
+        // 如果获取到无效的停车场id
+        if (StringUtils.isEmpty(Config.gwid )) {
+            // 弹出弹窗，进行停车场id设置
+            parkIdDialogShow();
+        }else {
+
+        }
+    }
+    // 设置停车场Id
+    public void parkIdDialogShow() {
+        // 弹出弹窗，进行停车场id设置
+        final ParkIdDialog parkIdDialog = new ParkIdDialog(context, new ParkIdDialog.OnCloseListener() {
+            @Override
+            public void onClick(String message) {
+                Config.gwid = message;
+                gwShare.save(Config.gwid);
+                if (StringUtils.isEmpty(message)) {
+                    Toast.makeText(context, "网关Id设置已完成", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        parkIdDialog.show();
+        showDialog(parkIdDialog, 1.5f);
+    }
+
+    // 弹窗界面设置
+    public void showDialog(Dialog dialog, float scale) {
+        Window window = dialog.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+        // 获得代表当前window属性的对象
+        WindowManager.LayoutParams params = window.getAttributes();
+        Point point = new Point();
+        Display display = getWindowManager().getDefaultDisplay();
+        // 将window的宽高信息保存在point中
+        display.getSize(point);
+        // 将设置后的大小赋值给window的宽高
+        params.width = point.x;
+        params.height = (int) (point.y * scale * 0.3f);
+        // 设置弹窗的透明程度0.0f-1.0f,0.0f完全透明。
+        params.alpha = 1.0f;
+        // 方式一：设置属性
+        window.setAttributes(params);
+        // 方式二：当window属性改变的时候也会调用此方法，同样可以实现
+        // dialog.onWindowAttributesChanged(params);
+        dialog.show();
     }
 
     int layoutPosition;
